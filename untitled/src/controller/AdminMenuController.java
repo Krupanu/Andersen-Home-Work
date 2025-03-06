@@ -1,53 +1,61 @@
 package controller;
 
-import abstractions.abstractionImpl.AdminServiceImpl;
+import exceptions.ResourceNotFoundException;
 import models.Customer;
 import models.Space;
+import repository.CustomerRepository;
+import repository.SpaceRepository;
+import utils.ValidationUtils;
 
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class AdminMenuController {
-    private final AdminServiceImpl adminServiceImpl;
-    public AdminMenuController() {
-        adminServiceImpl = new AdminServiceImpl();
-    }
+    SpaceRepository spaceRepository = SpaceRepository.getInstance();
     private static final AtomicInteger counter = new AtomicInteger(1);
+    CustomerRepository customerRepository = CustomerRepository.getInstance();
+
+    public AdminMenuController() {
+    }
+
     public void addCustomer() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter the name of the customer:");
         String name = scanner.nextLine();
+        ValidationUtils.validateCustomerName(name);
         int id = counter.getAndIncrement();
-        Customer customer = new Customer(id, name);
-        adminServiceImpl.addCustomer(customer);
+        customerRepository.addCustomer(new Customer(id, name));
     }
+
     public void removeCustomer() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter the id of the customer you want to remove:");
         int id = scanner.nextInt();
-        adminServiceImpl.removeCustomer(id);
+        ValidationUtils.validateCustomerId(id);
+        customerRepository.removeCustomer(id);
     }
+
     public void viewCustomer() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter the id of the customer you want to view:");
         int id = scanner.nextInt();
-        Customer customer = adminServiceImpl.getCustomerById(id);
-        if (customer != null) {
-            System.out.println("Customer Id: " + customer.getId());
-            System.out.println("Customer Name: " + customer.getName());
-        } else {
-            System.out.println("Customer not found!");
+        ValidationUtils.validateCustomerId(id);
+        for (Customer customer : customerRepository.getCustomers()) {
+            if (customer.getId() == id) {
+                System.out.println("Customer Id: " + customer.getId());
+                System.out.println("Customer Name: " + customer.getName());
+            } else {
+                System.out.println("Customer not found!");
+            }
         }
     }
 
     public void viewAllCustomers() {
-
-        for (Customer customer : adminServiceImpl.getAllCustomers()) {
+        for (Customer customer : customerRepository.getCustomers()) {
             if (customer == null) {
                 System.out.println("No customers found!");
                 break;
-            }
-            else {
+            } else {
                 System.out.println("Customer Id: " + customer.getId());
                 System.out.println("Customer Name: " + customer.getName());
             }
@@ -58,35 +66,35 @@ public class AdminMenuController {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter the type of the space:");
         String spaceType = scanner.nextLine();
+        ValidationUtils.validateSpaceType(spaceType);
         System.out.println("Enter the description of the space:");
         String description = scanner.nextLine();
+        ValidationUtils.validateSpaceDescription(description);
         System.out.println("Enter the price of the space:");
         Double price = scanner.nextDouble();
-        System.out.println("Enter the availability of the space:");
-        boolean spaceAvailability = scanner.nextBoolean();
-        int Id = counter.getAndIncrement();
-        Space space = new Space(Id, spaceType, description, price, spaceAvailability);
-        adminServiceImpl.addWorkSpace(space);
+        ValidationUtils.validateSpacePrice(price);
+        int id = counter.getAndIncrement();
+        spaceRepository.addSpace(new Space(id, spaceType, description, price, true));
     }
 
     public void removeWorkSpace() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter the id of the space you want to remove:");
         int id = scanner.nextInt();
-        adminServiceImpl.removeWorkSpace(id);
-    }
-
-    public void viewAllReservations() {
-        adminServiceImpl.viewAllReservations();
+        ValidationUtils.validateSpaceId(id);
+        try {
+            spaceRepository.removeSpace(id);
+        } catch (ResourceNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     public void viewAllWorkSpaces() {
-        for (Space space : adminServiceImpl.getAllWorkSpaces()) {
+        for (Space space : spaceRepository.getSpaces()) {
             if (space == null) {
                 System.out.println("No work spaces found!");
                 break;
-            }
-            else {
+            } else {
                 System.out.println("Space Id: " + space.getId());
                 System.out.println("Space Type: " + space.getSpaceType());
                 System.out.println("Space Description: " + space.getDescription());

@@ -1,9 +1,9 @@
 package models;
 
 public class Reservation {
-    private int id;
-    private int customerId;
-    private int spaceId;
+    private final int id;
+    private final int customerId;
+    private final int spaceId;
 
     public Reservation(int id, int customerId, int spaceId) {
         this.id = id;
