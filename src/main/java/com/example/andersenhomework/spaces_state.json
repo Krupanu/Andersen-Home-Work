@@ -1,0 +1,9 @@
+[
+  {
+    "id": 1,
+    "spaceType": "Room",
+    "description": "Descr",
+    "price": 12.0,
+    "spaceAvailability": false
+  }
+]
