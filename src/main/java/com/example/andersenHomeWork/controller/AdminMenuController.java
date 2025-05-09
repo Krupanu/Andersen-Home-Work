@@ -3,6 +3,7 @@ package com.example.andersenHomeWork.controller;
 import com.example.andersenHomeWork.abstractions.abstractionImpl.SpaceServiceImpl;
 import com.example.andersenHomeWork.abstractions.abstractionImpl.UserServiceImpl;
 import com.example.andersenHomeWork.dto.SpaceDto;
+import com.example.andersenHomeWork.dto.UserDto;
 import com.example.andersenHomeWork.models.Space;
 import com.example.andersenHomeWork.models.User;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +24,8 @@ public class AdminMenuController{
         this.spaceService = spaceService;
     }
     @GetMapping("/getAllCustomers")
-    public List<User>  getAllCustomers() {
-        return userService.findAllUsers();
+    public List<UserDto>  getAllCustomers() {
+        return userService.findAllCustomers();
     }
 
     @GetMapping("/getCustomer/{customerId}")

@@ -10,7 +10,7 @@ public interface UserService {
 
     User findByEmail(String email);
 
-    List<User> findAllUsers();
+    List<UserDto> findAllCustomers();
 
     User findById(Long id);
 }

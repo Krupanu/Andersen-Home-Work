@@ -2,19 +2,26 @@ package com.example.andersenHomeWork.abstractions.abstractionImpl;
 
 
 import com.example.andersenHomeWork.dto.UserDto;
+import com.example.andersenHomeWork.models.Role;
 import com.example.andersenHomeWork.models.User;
 import com.example.andersenHomeWork.repository.UserRepository;
 import com.example.andersenHomeWork.abstractions.UserService;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    @Autowired
+    private ModelMapper modelMapper;
 
     public UserServiceImpl(UserRepository userRepository,
                            PasswordEncoder passwordEncoder) {
@@ -38,9 +45,17 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByEmail(email);
     }
 
+    public List<UserDto> ConvertUserToCustomers(List<User> users, Role role) {
+        return users.stream()
+                .filter(user -> user.getRole().equals(Role.CUSTOMER))
+                .map(user -> modelMapper.map(user, UserDto.class))
+                .collect(Collectors.toList());
+    }
+
+
     @Override
-    public List<User> findAllUsers() {
-        return userRepository.findAll();
+    public List<UserDto> findAllCustomers() {
+        return ConvertUserToCustomers(userRepository.findAll(), Role.CUSTOMER);
     }
 
     @Override
